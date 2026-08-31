@@ -1,0 +1,11 @@
+.container {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: #f6f1ea;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
