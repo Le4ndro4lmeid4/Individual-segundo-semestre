@@ -27,6 +27,24 @@ public class ViagemDao {
         );
     }
 
+    public int atualizar(Viagem viagem) {
+        String sql = "UPDATE viagem SET destino = ?, data_inicio = ?, data_fim = ?, descricao = ? WHERE id = ?";
+
+        return jdbcTemplate.update(
+                sql,
+                viagem.getDestino(),
+                Date.valueOf(viagem.getDataInicio()),
+                viagem.getDataFim() != null ? Date.valueOf(viagem.getDataFim()) : null,
+                viagem.getDescricao(),
+                viagem.getId()
+        );
+    }
+
+    public int remover(Integer id) {
+        String sql = "DELETE FROM viagem WHERE id = ?";
+        return jdbcTemplate.update(sql, id);
+    }
+
     public List<Viagem> listar() {
         String sql = "SELECT * FROM viagem";
 

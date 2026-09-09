@@ -47,6 +47,41 @@ public class ViagemController {
         }
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<String> editar(
+            @PathVariable Integer id,
+            @RequestParam String destino,
+            @RequestParam String dataInicio,
+            @RequestParam(required = false) String dataFim,
+            @RequestParam(required = false) String descricao
+    ) {
+        try {
+            Viagem viagem = new Viagem();
+            viagem.setId(id);
+            viagem.setDestino(destino);
+            viagem.setDataInicio(LocalDate.parse(dataInicio));
+            viagem.setDataFim(dataFim != null && !dataFim.isBlank() ? LocalDate.parse(dataFim) : null);
+            viagem.setDescricao(descricao);
+
+            if (viagemDao.atualizar(viagem) == 0) {
+                return ResponseEntity.notFound().build();
+            }
+
+            return ResponseEntity.ok("Viagem atualizada com sucesso!");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Erro ao atualizar viagem.");
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> remover(@PathVariable Integer id) {
+        if (viagemDao.remover(id) == 0) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/{id}/imagem")
     public ResponseEntity<byte[]> buscarImagem(
             @PathVariable Integer id
