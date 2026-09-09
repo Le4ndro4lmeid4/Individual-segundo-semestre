@@ -1,5 +1,5 @@
 import ViagemCard from "../components/ViagemCard";
-import { listarViagens } from "../services/viagemService";
+import { editarViagem, listarViagens, removerViagem } from "../services/viagemService";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./Viagens.module.css";
@@ -8,7 +8,7 @@ function Viagens() {
   const navigate = useNavigate();
   const [viagens, setViagens] = useState([]);
   const [paginaAtual, setPaginaAtual] = useState(1);
-  const itensPorPagina = 4;
+  const itensPorPagina = 6;
 
   useEffect(() => {
     async function buscarViagens() {
@@ -30,6 +30,28 @@ function Viagens() {
     setPaginaAtual(proximaPagina);
   };
 
+  const salvarViagem = async (id, dados) => {
+    const salvou = await editarViagem(id, dados);
+
+    if (salvou) {
+      setViagens((viagensAtuais) => viagensAtuais.map((viagem) => (
+        viagem.id === id ? { ...viagem, ...dados } : viagem
+      )));
+    }
+
+    return salvou;
+  };
+
+  const apagarViagem = async (id) => {
+    const apagou = await removerViagem(id);
+
+    if (apagou) {
+      setViagens((viagensAtuais) => viagensAtuais.filter((viagem) => viagem.id !== id));
+    }
+
+    return apagou;
+  };
+
   return (
     <div className={styles.page}>
       <div className={styles.contentWrap}>
@@ -42,6 +64,8 @@ function Viagens() {
               dataInicio={viagem.dataInicio}
               dataFim={viagem.dataFim}
               descricao={viagem.descricao}
+              onSave={salvarViagem}
+              onDelete={apagarViagem}
             />
           ))}
         </section>

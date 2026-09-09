@@ -1,6 +1,6 @@
 .page {
   width: 100%;
-  max-width: 68.75rem;
+  max-width: 86rem;
   margin: 0 auto;
   padding: 0 1rem;
   display: flex;
@@ -10,17 +10,21 @@
 }
 
 .contentWrap {
-  max-width: 62.5rem;
+  max-width: 82.5rem;
   margin: 0 auto;
 }
 
 .gallery {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 1.125rem 1.25rem;
-  justify-items: stretch;
+  justify-content: center;
   width: 100%;
   margin: 0 auto;
+}
+
+.gallery > * {
+  flex: 0 1 26rem;
 }
 
 .pagination {
@@ -90,8 +94,8 @@
 }
 
 @media (max-width: 820px) {
-  .gallery {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .gallery > * {
+    flex-basis: calc(50% - 0.625rem);
   }
 }
 
@@ -101,7 +105,7 @@
     padding-right: 0.875rem;
   }
 
-  .gallery {
-    grid-template-columns: 1fr;
+  .gallery > * {
+    flex-basis: 100%;
   }
 }
