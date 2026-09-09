@@ -53,7 +53,8 @@ public class ViagemController {
             @RequestParam String destino,
             @RequestParam String dataInicio,
             @RequestParam(required = false) String dataFim,
-            @RequestParam(required = false) String descricao
+            @RequestParam(required = false) String descricao,
+            @RequestParam(required = false) MultipartFile imagem
     ) {
         try {
             Viagem viagem = new Viagem();
@@ -62,6 +63,9 @@ public class ViagemController {
             viagem.setDataInicio(LocalDate.parse(dataInicio));
             viagem.setDataFim(dataFim != null && !dataFim.isBlank() ? LocalDate.parse(dataFim) : null);
             viagem.setDescricao(descricao);
+            if (imagem != null && !imagem.isEmpty()) {
+                viagem.setImagem(imagem.getBytes());
+            }
 
             if (viagemDao.atualizar(viagem) == 0) {
                 return ResponseEntity.notFound().build();

@@ -28,15 +28,29 @@ public class ViagemDao {
     }
 
     public int atualizar(Viagem viagem) {
-        String sql = "UPDATE viagem SET destino = ?, data_inicio = ?, data_fim = ?, descricao = ? WHERE id = ?";
+        String sql = viagem.getImagem() != null
+            ? "UPDATE viagem SET destino = ?, data_inicio = ?, data_fim = ?, descricao = ?, imagem = ? WHERE id = ?"
+            : "UPDATE viagem SET destino = ?, data_inicio = ?, data_fim = ?, descricao = ? WHERE id = ?";
 
-        return jdbcTemplate.update(
+        if (viagem.getImagem() != null) {
+            return jdbcTemplate.update(
                 sql,
                 viagem.getDestino(),
                 Date.valueOf(viagem.getDataInicio()),
                 viagem.getDataFim() != null ? Date.valueOf(viagem.getDataFim()) : null,
                 viagem.getDescricao(),
+                viagem.getImagem(),
                 viagem.getId()
+            );
+        }
+
+        return jdbcTemplate.update(
+            sql,
+            viagem.getDestino(),
+            Date.valueOf(viagem.getDataInicio()),
+            viagem.getDataFim() != null ? Date.valueOf(viagem.getDataFim()) : null,
+            viagem.getDescricao(),
+            viagem.getId()
         );
     }
 
