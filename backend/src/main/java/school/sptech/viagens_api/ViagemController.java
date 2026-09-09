@@ -47,7 +47,7 @@ public class ViagemController {
         }
     }
 
-        @PatchMapping("/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<String> editar(
             @PathVariable Integer id,
             @RequestParam(required = false) String destino,
@@ -68,10 +68,10 @@ public class ViagemController {
             }
 
             if (viagemDao.atualizar(viagem, dataFim != null, descricao != null) == 0) {
-                return ResponseEntity.notFound().build();
+                return ResponseEntity.status(404).body("Viagem não encontrada.");
             }
 
-            return ResponseEntity.ok("Viagem atualizada com sucesso!");
+            return ResponseEntity.status(200).body("Viagem atualizada com sucesso!");
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Erro ao atualizar viagem.");
         }
@@ -80,10 +80,10 @@ public class ViagemController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> remover(@PathVariable Integer id) {
         if (viagemDao.remover(id) == 0) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(404).build();
         }
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(204).build();
     }
 
     @GetMapping("/{id}/imagem")
@@ -99,9 +99,7 @@ public class ViagemController {
                     .body(imagem);
 
         } catch (Exception e) {
-            return ResponseEntity
-                    .notFound()
-                    .build();
+                return ResponseEntity.status(404).build();
         }
     }
 }
