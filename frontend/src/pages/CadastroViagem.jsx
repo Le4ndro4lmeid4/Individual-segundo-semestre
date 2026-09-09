@@ -29,8 +29,8 @@ function CadastroViagem() {
 
   return (
     <main className={styles.page}>
-      <form className={styles.form} onSubmit={handleSubmit}>
-        <h1 className={styles.titulo}>Cadastrar Viagem</h1>
+      <form className={styles.form} onSubmit={handleSubmit} aria-labelledby="titulo-cadastro">
+        <h1 id="titulo-cadastro" className={styles.titulo}>Cadastrar Viagem</h1>
 
         <div className={styles.campo}>
           <label htmlFor="destino">Destino</label>
@@ -40,6 +40,7 @@ function CadastroViagem() {
             id="destino"
             value={destino}
             onChange={(event) => setDestino(event.target.value)}
+            required
           />
         </div>
 
@@ -51,6 +52,7 @@ function CadastroViagem() {
             id="dataInicio"
             value={dataInicio}
             onChange={(event) => setDataInicio(event.target.value)}
+            required
           />
         </div>
 
@@ -81,7 +83,9 @@ function CadastroViagem() {
           <input
             type="file"
             id="imagem"
+            accept="image/*"
             onChange={(event) => setImagem(event.target.files[0])}
+            required
           />
         </div>
 

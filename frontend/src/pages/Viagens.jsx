@@ -53,7 +53,7 @@ function Viagens() {
   };
 
   return (
-    <div className={styles.page}>
+    <main className={styles.page} aria-label="Página de viagens">
       <div className={styles.contentWrap}>
         <section className={styles.gallery} aria-label="Galeria de viagens">
           {viagensDaPagina.map((viagem) => (
@@ -114,7 +114,7 @@ function Viagens() {
       >
         ←
       </button>
-    </div>
+    </main>
   );
 }
 

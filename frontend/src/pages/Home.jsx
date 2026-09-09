@@ -9,7 +9,7 @@ function Home() {
 
   return (
     <main className={styles.container}>
-      <section className={styles.album} aria-label="Capa do álbum de viagens">
+      <section className={styles.album} aria-labelledby="titulo-home">
         <img
           className={styles.coverImage}
           src={coverImage}
@@ -17,7 +17,7 @@ function Home() {
         />
 
         <div className={styles.content}>
-          <h1 className={styles.title}>Minhas Viagens</h1>
+          <h1 id="titulo-home" className={styles.title}>Minhas Viagens</h1>
 
           <div className={styles.actions}>
             <button
