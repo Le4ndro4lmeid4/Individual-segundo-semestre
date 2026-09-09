@@ -47,11 +47,11 @@ public class ViagemController {
         }
     }
 
-    @PutMapping("/{id}")
+        @PatchMapping("/{id}")
     public ResponseEntity<String> editar(
             @PathVariable Integer id,
-            @RequestParam String destino,
-            @RequestParam String dataInicio,
+            @RequestParam(required = false) String destino,
+            @RequestParam(required = false) String dataInicio,
             @RequestParam(required = false) String dataFim,
             @RequestParam(required = false) String descricao,
             @RequestParam(required = false) MultipartFile imagem
@@ -60,14 +60,14 @@ public class ViagemController {
             Viagem viagem = new Viagem();
             viagem.setId(id);
             viagem.setDestino(destino);
-            viagem.setDataInicio(LocalDate.parse(dataInicio));
+            viagem.setDataInicio(dataInicio != null && !dataInicio.isBlank() ? LocalDate.parse(dataInicio) : null);
             viagem.setDataFim(dataFim != null && !dataFim.isBlank() ? LocalDate.parse(dataFim) : null);
             viagem.setDescricao(descricao);
             if (imagem != null && !imagem.isEmpty()) {
                 viagem.setImagem(imagem.getBytes());
             }
 
-            if (viagemDao.atualizar(viagem) == 0) {
+            if (viagemDao.atualizar(viagem, dataFim != null, descricao != null) == 0) {
                 return ResponseEntity.notFound().build();
             }
 
