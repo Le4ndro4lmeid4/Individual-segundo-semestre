@@ -28,16 +28,14 @@ async function adicionarViagem(formData) {
 async function editarViagem(id, dados) {
   try {
     const formData = new FormData();
-    formData.append("destino", dados.destino);
-    formData.append("dataInicio", dados.dataInicio);
-    formData.append("dataFim", dados.dataFim || "");
-    formData.append("descricao", dados.descricao || "");
-    if (dados.imagem) {
-      formData.append("imagem", dados.imagem);
-    }
+    Object.entries(dados).forEach(([campo, valor]) => {
+      if (valor !== undefined && valor !== null) {
+        formData.append(campo, valor);
+      }
+    });
 
     const response = await fetch(`http://localhost:8080/viagens/${id}`, {
-      method: "PUT",
+      method: "PATCH",
       body: formData,
     });
 

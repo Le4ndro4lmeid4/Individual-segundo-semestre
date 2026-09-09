@@ -3,6 +3,13 @@ import { useState } from "react";
 import { createPortal } from "react-dom";
 import { Pencil, Trash2 } from "lucide-react";
 
+function formatarData(data) {
+  if (!data) return "Sem data final";
+
+  const [ano, mes, dia] = data.split("-");
+  return `${dia}/${mes}/${ano}`;
+}
+
 function ViagemCard({ id, destino, dataInicio, dataFim, descricao, onSave, onDelete }) {
   const [modalAberto, setModalAberto] = useState(false);
   const [confirmacaoAberta, setConfirmacaoAberta] = useState(false);
@@ -21,8 +28,18 @@ function ViagemCard({ id, destino, dataInicio, dataFim, descricao, onSave, onDel
   };
 
   const salvarEdicao = async () => {
+    const dadosOriginais = { destino, dataInicio, dataFim: dataFim || "", descricao: descricao || "" };
+    const dadosAlterados = Object.fromEntries(
+      Object.entries(dados).filter(([campo, valor]) => campo === "imagem" || valor !== dadosOriginais[campo])
+    );
+
+    if (Object.keys(dadosAlterados).length === 0) {
+      setModalAberto(false);
+      return;
+    }
+
     setSalvando(true);
-    const salvou = await onSave(id, dados);
+    const salvou = await onSave(id, dadosAlterados);
     setSalvando(false);
 
     if (salvou) {
@@ -60,7 +77,7 @@ function ViagemCard({ id, destino, dataInicio, dataFim, descricao, onSave, onDel
 
       <div className={styles.content}>
         <h2 className={styles.destino}>{destino}</h2>
-        <p className={styles.data}>{dataInicio} - {dataFim || "Sem data final"}</p>
+        <p className={styles.data}>{formatarData(dataInicio)} - {formatarData(dataFim)}</p>
         <p className={styles.descricao}>{descricao || "Sem descrição"}</p>
       </div>
 
