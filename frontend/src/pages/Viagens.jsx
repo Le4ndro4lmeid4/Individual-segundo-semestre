@@ -47,7 +47,12 @@ function Viagens() {
   };
 
   const salvarViagem = async (id, dados) => {
-    if (!dados.destino?.trim() || dados.destino.length > 30) {
+    const viagemAtual = viagens.find((viagem) => viagem.id === id);
+    const destinoEfetivo = Object.prototype.hasOwnProperty.call(dados, "destino")
+      ? dados.destino
+      : viagemAtual?.destino;
+
+    if (!destinoEfetivo?.trim() || destinoEfetivo.length > 30) {
       setToast({ type: "error", message: "O destino deve ter entre 1 e 30 caracteres." });
       return false;
     }
@@ -57,7 +62,6 @@ function Viagens() {
       return false;
     }
 
-    const viagemAtual = viagens.find((viagem) => viagem.id === id);
     const dataInicioEfetiva = dados.dataInicio || viagemAtual?.dataInicio;
     const dataFimFoiAlterada = Object.prototype.hasOwnProperty.call(dados, "dataFim");
     const dataFimEfetiva = dataFimFoiAlterada ? dados.dataFim : viagemAtual?.dataFim;
