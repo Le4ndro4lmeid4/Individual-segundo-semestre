@@ -1,28 +1,45 @@
+async function mensagemDoErro(response, mensagemPadrao) {
+  const mensagem = await response.text();
+  return mensagem.trim() || mensagemPadrao;
+}
+
 async function listarViagens() {
-    try {
+  try {
     const response = await fetch("http://localhost:8080/viagens", {
       method: "GET"
     });
 
-    return response.json();
+    if (!response.ok) {
+      throw new Error(await mensagemDoErro(response, "Não foi possível carregar as viagens."));
+    }
 
+    return response.json();
   } catch (error) {
-    console.log("Failed to connect to the API");
-}
+    if (error instanceof TypeError) {
+      throw new Error("Não foi possível conectar à API.");
+    }
+    throw error;
+  }
 }
 
 async function adicionarViagem(formData) {
-    try {
+  try {
     const response = await fetch("http://localhost:8080/viagens", {
       method: "POST",
       body: formData,
     });
 
-    return response.status;
+    if (!response.ok) {
+      throw new Error(await mensagemDoErro(response, "Não foi possível cadastrar a viagem."));
+    }
 
+    return response.status;
   } catch (error) {
-    console.log("Failed to connect to the API");
-}
+    if (error instanceof TypeError) {
+      throw new Error("Não foi possível conectar à API.");
+    }
+    throw error;
+  }
 }
 
 async function editarViagem(id, dados) {
@@ -39,10 +56,16 @@ async function editarViagem(id, dados) {
       body: formData,
     });
 
-    return response.ok;
+    if (!response.ok) {
+      throw new Error(await mensagemDoErro(response, "Não foi possível editar a viagem."));
+    }
+
+    return true;
   } catch (error) {
-    console.log("Failed to connect to the API");
-    return false;
+    if (error instanceof TypeError) {
+      throw new Error("Não foi possível conectar à API.");
+    }
+    throw error;
   }
 }
 
@@ -52,10 +75,16 @@ async function removerViagem(id) {
       method: "DELETE",
     });
 
-    return response.ok;
+    if (!response.ok) {
+      throw new Error(await mensagemDoErro(response, "Não foi possível excluir a viagem."));
+    }
+
+    return true;
   } catch (error) {
-    console.log("Failed to connect to the API");
-    return false;
+    if (error instanceof TypeError) {
+      throw new Error("Não foi possível conectar à API.");
+    }
+    throw error;
   }
 }
 

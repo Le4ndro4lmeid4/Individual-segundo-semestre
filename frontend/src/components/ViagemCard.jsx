@@ -66,11 +66,11 @@ function ViagemCard({ id, destino, dataInicio, dataFim, descricao, onSave, onDel
           className={styles.imagem}
         />
         <div className={styles.cardActions}>
-          <button type="button" className={styles.iconButton} onClick={() => setModalAberto(true)} aria-label="Editar viagem" title="Editar viagem">
-            <Pencil aria-hidden="true" />
+          <button type="button" className={styles.iconButton} onClick={() => setModalAberto(true)} title="Editar viagem">
+            <Pencil />
           </button>
-          <button type="button" className={`${styles.iconButton} ${styles.deleteButton}`} onClick={() => setConfirmacaoAberta(true)} disabled={apagando} aria-label="Apagar viagem" title="Apagar viagem">
-            {apagando ? "..." : <Trash2 aria-hidden="true" />}
+          <button type="button" className={`${styles.iconButton} ${styles.deleteButton}`} onClick={() => setConfirmacaoAberta(true)} disabled={apagando} title="Apagar viagem">
+            {apagando ? "..." : <Trash2 />}
           </button>
         </div>
       </div>
@@ -82,16 +82,16 @@ function ViagemCard({ id, destino, dataInicio, dataFim, descricao, onSave, onDel
       </div>
 
       {modalAberto && (
-        createPortal(<div className={styles.modalBackdrop} role="presentation" onMouseDown={(event) => event.target === event.currentTarget && !salvando && cancelarEdicao()}>
-          <div className={styles.modal} role="dialog" aria-modal="true" aria-labelledby={`editar-viagem-${id}`}>
+        createPortal(<div className={styles.modalBackdrop} onMouseDown={(event) => event.target === event.currentTarget && !salvando && cancelarEdicao()}>
+          <div className={styles.modal}>
             <div className={styles.modalHeader}>
               <h2 id={`editar-viagem-${id}`}>Editar viagem</h2>
             </div>
             <input
               className={styles.input}
               value={dados.destino}
+              maxLength={30}
               onChange={(event) => alterarCampo("destino", event.target.value)}
-              aria-label="Destino"
               placeholder="Destino"
             />
             <div className={styles.datas}>
@@ -100,21 +100,20 @@ function ViagemCard({ id, destino, dataInicio, dataFim, descricao, onSave, onDel
                 type="date"
                 value={dados.dataInicio}
                 onChange={(event) => alterarCampo("dataInicio", event.target.value)}
-                aria-label="Data de início"
               />
               <input
                 className={styles.input}
                 type="date"
                 value={dados.dataFim}
+                min={dados.dataInicio || undefined}
                 onChange={(event) => alterarCampo("dataFim", event.target.value)}
-                aria-label="Data de fim"
               />
             </div>
             <textarea
               className={styles.input}
               value={dados.descricao}
+              maxLength={30}
               onChange={(event) => alterarCampo("descricao", event.target.value)}
-              aria-label="Descrição"
               placeholder="Descrição"
               rows="4"
             />
@@ -122,12 +121,12 @@ function ViagemCard({ id, destino, dataInicio, dataFim, descricao, onSave, onDel
               Foto da viagem
               <input
                 type="file"
-                accept="image/*"
+                accept="image/jpeg,image/png,image/webp"
                 onChange={(event) => alterarCampo("imagem", event.target.files[0] || null)}
               />
             </label>
             <div className={styles.actions}>
-              <button type="button" onClick={salvarEdicao} disabled={salvando || !dados.destino || !dados.dataInicio}>
+              <button type="button" onClick={salvarEdicao} disabled={salvando || !dados.destino.trim() || !dados.dataInicio}>
                 {salvando ? "Salvando..." : "Salvar"}
               </button>
               <button type="button" onClick={cancelarEdicao} disabled={salvando}>
@@ -139,8 +138,8 @@ function ViagemCard({ id, destino, dataInicio, dataFim, descricao, onSave, onDel
       )}
 
       {confirmacaoAberta && (
-        createPortal(<div className={styles.modalBackdrop} role="presentation" onMouseDown={(event) => event.target === event.currentTarget && !apagando && setConfirmacaoAberta(false)}>
-          <div className={styles.confirmationModal} role="dialog" aria-modal="true" aria-labelledby={`confirmar-exclusao-${id}`}>
+        createPortal(<div className={styles.modalBackdrop} onMouseDown={(event) => event.target === event.currentTarget && !apagando && setConfirmacaoAberta(false)}>
+          <div className={styles.confirmationModal}>
             <h2 id={`confirmar-exclusao-${id}`}>Apagar viagem?</h2>
             <p>Essa ação não poderá ser desfeita.</p>
             <div className={styles.actions}>

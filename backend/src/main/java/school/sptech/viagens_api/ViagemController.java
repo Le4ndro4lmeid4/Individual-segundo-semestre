@@ -1,12 +1,14 @@
 package school.sptech.viagens_api;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+import java.util.List;
+
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.time.LocalDate;
-import java.util.List;
 
 @RestController
 @RequestMapping("/viagens")
@@ -32,16 +34,36 @@ public class ViagemController {
             @RequestParam("imagem") MultipartFile imagem
     ) {
         try {
+            if (destino.isBlank() || destino.length() > 30) {
+                return ResponseEntity.status(400).body("O destino deve ter entre 1 e 30 caracteres.");
+            }
+            if (descricao != null && descricao.length() > 30) {
+                return ResponseEntity.status(400).body("A descrição deve ter no máximo 30 caracteres.");
+            }
+            if (imagem.isEmpty() || !tipoImagemPermitido(imagem)) {
+                return ResponseEntity.status(400).body("Envie uma imagem válida.");
+            }
+
+            LocalDate inicio = LocalDate.parse(dataInicio);
+            LocalDate fim = dataFim != null && !dataFim.isBlank() ? LocalDate.parse(dataFim) : null;
+
+            if (fim != null && fim.isBefore(inicio)) {
+                return ResponseEntity.status(400).body("A data de fim não pode ser anterior à data de início.");
+            }
+
             Viagem viagem = new Viagem();
             viagem.setDestino(destino);
-            viagem.setDataInicio(LocalDate.parse(dataInicio));
-            viagem.setDataFim(dataFim != null && !dataFim.isBlank() ? LocalDate.parse(dataFim) : null);
+            viagem.setDataInicio(inicio);
+            viagem.setDataFim(fim);
             viagem.setDescricao(descricao);
             viagem.setImagem(imagem.getBytes());
+            viagem.setTipoImagem(imagem.getContentType());
 
             viagemDao.adicionar(viagem);
 
             return ResponseEntity.status(201).body("Viagem cadastrada com sucesso!");
+        } catch (DateTimeParseException e) {
+            return ResponseEntity.status(400).body("Informe datas válidas.");
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Erro ao cadastrar viagem.");
         }
@@ -57,14 +79,38 @@ public class ViagemController {
             @RequestParam(required = false) MultipartFile imagem
     ) {
         try {
+            if (destino != null && (destino.isBlank() || destino.length() > 30)) {
+                return ResponseEntity.status(400).body("O destino deve ter entre 1 e 30 caracteres.");
+            }
+            if (descricao != null && descricao.length() > 30) {
+                return ResponseEntity.status(400).body("A descrição deve ter no máximo 30 caracteres.");
+            }
+                if (imagem != null && !imagem.isEmpty()
+                    && !tipoImagemPermitido(imagem)) {
+                return ResponseEntity.status(400).body("Envie uma imagem válida.");
+            }
+
+            Viagem viagemAtual = viagemDao.buscarPorId(id);
+            LocalDate inicio = dataInicio != null && !dataInicio.isBlank()
+                ? LocalDate.parse(dataInicio)
+                : viagemAtual.getDataInicio();
+            LocalDate fim = dataFim != null
+                ? (dataFim.isBlank() ? null : LocalDate.parse(dataFim))
+                : viagemAtual.getDataFim();
+
+            if (fim != null && fim.isBefore(inicio)) {
+            return ResponseEntity.status(400).body("A data de fim não pode ser anterior à data de início.");
+            }
+
             Viagem viagem = new Viagem();
             viagem.setId(id);
             viagem.setDestino(destino);
-            viagem.setDataInicio(dataInicio != null && !dataInicio.isBlank() ? LocalDate.parse(dataInicio) : null);
-            viagem.setDataFim(dataFim != null && !dataFim.isBlank() ? LocalDate.parse(dataFim) : null);
+            viagem.setDataInicio(dataInicio != null && !dataInicio.isBlank() ? inicio : null);
+            viagem.setDataFim(dataFim != null && !dataFim.isBlank() ? fim : null);
             viagem.setDescricao(descricao);
             if (imagem != null && !imagem.isEmpty()) {
                 viagem.setImagem(imagem.getBytes());
+                viagem.setTipoImagem(imagem.getContentType());
             }
 
             if (viagemDao.atualizar(viagem, dataFim != null, descricao != null) == 0) {
@@ -72,6 +118,10 @@ public class ViagemController {
             }
 
             return ResponseEntity.status(200).body("Viagem atualizada com sucesso!");
+        } catch (EmptyResultDataAccessException e) {
+            return ResponseEntity.status(404).body("Viagem não encontrada.");
+        } catch (DateTimeParseException e) {
+            return ResponseEntity.status(400).body("Informe datas válidas.");
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Erro ao atualizar viagem.");
         }
@@ -93,13 +143,23 @@ public class ViagemController {
         try {
             byte[] imagem = viagemDao.buscarImagemPorId(id);
 
-            return ResponseEntity
-                    .ok()
-                    .contentType(MediaType.IMAGE_JPEG)
-                    .body(imagem);
+                String tipoImagem = viagemDao.buscarPorId(id).getTipoImagem();
+                MediaType contentType = tipoImagem != null
+                    ? MediaType.parseMediaType(tipoImagem)
+                    : MediaType.IMAGE_JPEG;
+
+                return ResponseEntity.ok().contentType(contentType).body(imagem);
 
         } catch (Exception e) {
                 return ResponseEntity.status(404).build();
         }
     }
+
+    private boolean tipoImagemPermitido(MultipartFile imagem) {
+        return imagem.getContentType() != null
+                && (imagem.getContentType().equals("image/jpeg")
+                || imagem.getContentType().equals("image/png")
+                || imagem.getContentType().equals("image/webp"));
+    }
+
 }

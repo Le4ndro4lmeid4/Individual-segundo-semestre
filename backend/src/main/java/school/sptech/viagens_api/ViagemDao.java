@@ -16,7 +16,7 @@ public class ViagemDao {
     }
 
     public void adicionar(Viagem viagem) {
-        String sql = "INSERT INTO viagem (destino, data_inicio, data_fim, descricao, imagem) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO viagem (destino, data_inicio, data_fim, descricao, imagem, tipo_imagem) VALUES (?, ?, ?, ?, ?, ?)";
 
         jdbcTemplate.update(
                 sql,
@@ -24,7 +24,8 @@ public class ViagemDao {
                 Date.valueOf(viagem.getDataInicio()),
                 viagem.getDataFim() != null ? Date.valueOf(viagem.getDataFim()) : null,
                 viagem.getDescricao(),
-                viagem.getImagem()
+                viagem.getImagem(),
+                viagem.getTipoImagem()
         );
     }
 
@@ -51,6 +52,8 @@ public class ViagemDao {
         if (viagem.getImagem() != null) {
             campos.add("imagem = ?");
             valores.add(viagem.getImagem());
+            campos.add("tipo_imagem = ?");
+            valores.add(viagem.getTipoImagem());
         }
 
         if (campos.isEmpty()) {
@@ -81,9 +84,27 @@ public class ViagemDao {
 
             viagem.setDescricao(rs.getString("descricao"));
             viagem.setImagem(rs.getBytes("imagem"));
+            viagem.setTipoImagem(rs.getString("tipo_imagem"));
 
             return viagem;
         });
+    }
+
+    public Viagem buscarPorId(Integer id) {
+        String sql = "SELECT * FROM viagem WHERE id = ?";
+
+        return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> {
+            Viagem viagem = new Viagem();
+            viagem.setId(rs.getInt("id"));
+            viagem.setDestino(rs.getString("destino"));
+            viagem.setDataInicio(rs.getDate("data_inicio").toLocalDate());
+
+            Date dataFim = rs.getDate("data_fim");
+            viagem.setDataFim(dataFim != null ? dataFim.toLocalDate() : null);
+            viagem.setDescricao(rs.getString("descricao"));
+            viagem.setTipoImagem(rs.getString("tipo_imagem"));
+            return viagem;
+        }, id);
     }
 
     public byte[] buscarImagemPorId(Integer id) {

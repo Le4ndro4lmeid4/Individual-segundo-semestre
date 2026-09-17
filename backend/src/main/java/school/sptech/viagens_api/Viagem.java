@@ -10,6 +10,7 @@ public class Viagem {
     private LocalDate dataFim;
     private String descricao;
     private byte[] imagem;
+    private String tipoImagem;
 
     public Viagem() {
     }
@@ -69,5 +70,13 @@ public class Viagem {
 
     public void setImagem(byte[] imagem) {
         this.imagem = imagem;
+    }
+
+    public String getTipoImagem() {
+        return tipoImagem;
+    }
+
+    public void setTipoImagem(String tipoImagem) {
+        this.tipoImagem = tipoImagem;
     }
 }

@@ -9,7 +9,7 @@ function Home() {
 
   return (
     <main className={styles.container}>
-      <section className={styles.album} aria-labelledby="titulo-home">
+      <section className={styles.album}>
         <img
           className={styles.coverImage}
           src={coverImage}
